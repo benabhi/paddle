@@ -389,7 +389,7 @@ defmodule Paddle do
                    {:get,
                     Keyword.get(kwdn, :filter),
                     Keyword.get(kwdn, :base),
-                    :base})
+                    :base}, :infinity)
   end
 
   @spec get(Paddle.Class.t) :: {:ok, [Paddle.Class.t]} | {:error, search_ldap_error}
@@ -431,7 +431,7 @@ defmodule Paddle do
              |> Filters.merge_filter(fields_filter)
              |> Filters.merge_filter(additional_filter)
     location = Paddle.Class.location(object)
-    with {:ok, entries} <- GenServer.call(Paddle, {:get, filter, location, :base}) do
+    with {:ok, entries} <- GenServer.call(Paddle, {:get, filter, location, :base}, :infinity) do
       {:ok,
        entries
        |> Enum.map(&Parsing.entry_to_class_object(&1, object))}
@@ -513,7 +513,7 @@ defmodule Paddle do
   this: `homeDirectory: ['/home/user']`
   """
   def add(kwdn, attributes), do:
-    GenServer.call(Paddle, {:add, kwdn, attributes, :base})
+    GenServer.call(Paddle, {:add, kwdn, attributes, :base}, :infinity)
 
   @spec add(Paddle.Class.t) :: :ok | {:error, :missing_unique_identifier} |
   {:error, :missing_req_attributes, [atom]} | {:error, add_ldap_error}
@@ -554,12 +554,12 @@ defmodule Paddle do
   `MyApp.PosixAccount` is configured appropriately).
   """
   def delete(kwdn) when is_list(kwdn) or is_binary(kwdn) do
-    GenServer.call(Paddle, {:delete, kwdn, :base})
+    GenServer.call(Paddle, {:delete, kwdn, :base}, :infinity)
   end
 
   def delete(class_object) when is_map(class_object) do
     with {:ok, dn} <- get_dn(class_object) do
-      GenServer.call(Paddle, {:delete, dn, :base})
+      GenServer.call(Paddle, {:delete, dn, :base}, :infinity)
     end
   end
 
@@ -611,12 +611,12 @@ defmodule Paddle do
 
   """
   def modify(kwdn, mods) when is_list(kwdn) or is_binary(kwdn) do
-    GenServer.call(Paddle, {:modify, kwdn, :base, mods})
+    GenServer.call(Paddle, {:modify, kwdn, :base, mods}, :infinity)
   end
 
   def modify(class_object, mods) when is_map(class_object) do
     with {:ok, dn} <- get_dn(class_object) do
-      GenServer.call(Paddle, {:modify, dn, :base, mods})
+      GenServer.call(Paddle, {:modify, dn, :base, mods}, :infinity)
     end
   end
 
